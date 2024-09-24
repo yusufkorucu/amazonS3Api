@@ -7,7 +7,6 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/newrelic/go-agent/v3/newrelic"
 	"log"
 	"net/url"
 )
@@ -44,13 +43,8 @@ func NewAmazonS3ApiClient() *AmazonS3ApiClient {
 	}
 }
 
-func (s *AmazonS3ApiClient) UploadFile(uploadPath string, fileName string, file []byte, trn *newrelic.Transaction) (error, string) {
+func (s *AmazonS3ApiClient) UploadFile(uploadPath string, fileName string, file []byte) (error, string) {
 	key := fmt.Sprintf("%s/%s", uploadPath, fileName)
-	segment := newrelic.ExternalSegment{
-		StartTime: trn.StartSegmentNow(),
-		Library:   "AWS S3",
-	}
-	defer segment.End()
 
 	_, err := s.client.PutObject(&s3.PutObjectInput{
 		Bucket:      aws.String(s.config.BucketName),
